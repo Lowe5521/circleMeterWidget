@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleMeterView">
+        <attr name="centerText" format="string"/>
+        <attr name="smallText" format="string"/>
+    </declare-styleable>
+</resources>
