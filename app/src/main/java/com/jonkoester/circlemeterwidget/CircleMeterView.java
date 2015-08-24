@@ -82,7 +82,6 @@ public class CircleMeterView extends RelativeLayout {
     protected void onDraw(Canvas canvas) {
         if (frameBounds == null) {
             frameBounds = new RectF(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth);
-            canvas.drawOval(frameBounds, circlePaint);
         }
 
         animateProgress(canvas);
@@ -91,6 +90,7 @@ public class CircleMeterView extends RelativeLayout {
     private void animateProgress(Canvas canvas) {
         canvas.drawOval(frameBounds, circlePaint);
         canvas.drawArc(frameBounds, prevAngle, progressAngle, false, progressPaint);
+        
         if (progressAngle < sweepAngle) {
             progressAngle += angleIncrements;
             actualUnitsTV.setText(String.format("%.0f", prevActualUnits++));
