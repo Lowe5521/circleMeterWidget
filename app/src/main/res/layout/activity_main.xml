@@ -25,6 +25,7 @@
             android:id="@+id/circleMeterWidgetPercent"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            circleMeter:centerText="30"
             circleMeter:smallText="%" />
     </LinearLayout>
 

@@ -13,20 +13,20 @@ import android.widget.TextView;
 
 public class CircleMeterView extends RelativeLayout {
 
-    private Canvas canvas;
     private RectF frameBounds;
     private Paint circlePaint;
     private Float strokeWidth;
-    private TextView centerTextView;
-    private TextView smallTextView;
     private String centerText;
     private String smallText;
-    private float actualUnits;
-    private float totalUnits;
+    private Float actualUnits;
+    private Float prevActualUnits;
+    private Float totalUnits;
     private Paint progressPaint;
     private Float sweepAngle;
-    private Float sweepArc;
+    private Float progressAngle;
     private Float prevAngle;
+    private TextView actualUnitsTV;
+    private float angleIncrements;
 
     private final static float DEFAULT_STROKE_WIDTH = 15f;
     private final static float DEFAULT_START_ANGLE = 90f;
@@ -60,21 +60,23 @@ public class CircleMeterView extends RelativeLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (this.canvas == null) {
-            this.canvas = canvas;
+        if (frameBounds == null) {
+            frameBounds = new RectF(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth);
+            canvas.drawOval(frameBounds, circlePaint);
         }
 
-        frameBounds.set(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth);
+        animateProgress(canvas);
+    }
 
-        centerTextView.setText(centerText);
-        smallTextView.setText(smallText);
-
+    private void animateProgress(Canvas canvas) {
         canvas.drawOval(frameBounds, circlePaint);
-        canvas.drawArc(frameBounds, prevAngle, sweepArc, false, progressPaint);
-
-        if (sweepArc < sweepAngle) {
-            sweepArc+=2;
+        canvas.drawArc(frameBounds, prevAngle, progressAngle, false, progressPaint);
+        if (progressAngle < sweepAngle) {
+            progressAngle += angleIncrements;
+            actualUnitsTV.setText(String.format("%.0f", prevActualUnits++));
             invalidate();
+        } else {
+            actualUnitsTV.setText(centerText);
         }
     }
 
@@ -84,36 +86,39 @@ public class CircleMeterView extends RelativeLayout {
             setBackground(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        frameBounds = new RectF();
-
         circlePaint = new Paint();
         progressPaint = new Paint();
+        strokeWidth = DEFAULT_STROKE_WIDTH;
 
         // Circle paint setup
         circlePaint.setAntiAlias(true);
         circlePaint.setColor(Color.BLACK);
         circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
+        circlePaint.setStrokeWidth(strokeWidth);
 
         // Progress paint setup
         progressPaint.setAntiAlias(true);
         progressPaint.setColor(Color.GRAY);
         progressPaint.setStyle(Paint.Style.STROKE);
-        progressPaint.setStrokeWidth(getStrokeWidth());
+        progressPaint.setStrokeWidth(strokeWidth);
 
-        centerTextView = (TextView) findViewById(R.id.circle_meter_center_text);
-        centerTextView.setTextColor(Color.BLACK);
-        smallTextView = (TextView) findViewById(R.id.circle_meter_small_text);
-        smallTextView.setTextColor(Color.BLACK);
+        actualUnitsTV = (TextView) findViewById(R.id.circle_meter_center_text);
+        actualUnitsTV.setTextColor(Color.BLACK);
+        TextView totalUnitsTV = (TextView) findViewById(R.id.circle_meter_small_text);
+        totalUnitsTV.setTextColor(Color.BLACK);
+        actualUnitsTV.setText(centerText);
+        totalUnitsTV.setText(smallText);
 
         prevAngle = DEFAULT_START_ANGLE;
         sweepAngle = 0f;
-        sweepArc = 0f;
+        progressAngle = 0f;
+        angleIncrements = getAngleIncrements();
         centerText = centerText != null ? centerText : "0";
-        smallText = smallText != null ? smallText : "0";
+        smallText = smallText != null ? smallText : "%";
         actualUnits = Float.valueOf(centerText);
+        prevActualUnits = 0f;
 
-        if (!smallText.equals("%")){
+        if (!smallText.equals("%")) {
             totalUnits = Float.valueOf(smallText);
         }
 
@@ -125,10 +130,10 @@ public class CircleMeterView extends RelativeLayout {
             prevAngle = sweepAngle;
         }
 
-        if (totalUnits > 0) {
-            sweepAngle = actualUnits / totalUnits * 360.0f;
-        } else {
+        if (isPercentage()) {
             sweepAngle = actualUnits / 100 * 360.0f;
+        } else {
+            sweepAngle = actualUnits / totalUnits * 360.0f;
         }
 
         if (sweepAngle >= 360f) {
@@ -137,51 +142,42 @@ public class CircleMeterView extends RelativeLayout {
         } else {
             progressPaint.setColor(Color.GRAY);
         }
-    }
 
-    public Float getStrokeWidth() {
-        if (strokeWidth == null) {
-            strokeWidth = DEFAULT_STROKE_WIDTH;
-        }
-        return strokeWidth;
+        invalidate();
     }
 
     public void setCenterText(String centerText) {
+        prevActualUnits = actualUnits;
         actualUnits = Float.valueOf(centerText);
-        if ((smallText.equals("%") && actualUnits <= 100f) ||
-                actualUnits <= totalUnits) {
-            this.centerText = centerText;
-        } else if (actualUnits >= totalUnits) {
-            if (smallText.equals("%")) {
-                actualUnits = 100f;
-            } else {
-                actualUnits = totalUnits;
-            }
-            this.centerText = String.format("%.0f", actualUnits);
+
+        if (isPercentage()) {
+            actualUnits = actualUnits <= 100 ? actualUnits : 100;
+        } else {
+            actualUnits = actualUnits <= totalUnits ? actualUnits : totalUnits;
         }
 
-        updateMeter();
-    }
-
-    public void setSmallText(String smallText) {
-        totalUnits = smallText.equals("%") ? 0 : Float.valueOf(smallText);
-        this.smallText = smallText;
+        this.centerText = String.format("%.0f", actualUnits);
         updateMeter();
     }
 
     public void setActualUnits(float actualUnits) {
-        if (actualUnits <= totalUnits ||
-                smallText.equals("%")) {
-            setCenterText(String.format("%.0f", actualUnits));
-            this.actualUnits = actualUnits;
-        } else {
-            setCenterText(String.format("%.0f", totalUnits));
-            this.actualUnits = totalUnits;
-        }
+        setCenterText(String.format("%.0f", actualUnits));
         updateMeter();
     }
 
     public float getActualUnits() {
         return actualUnits;
+    }
+
+    private float getAngleIncrements() {
+        if (isPercentage()) {
+            return 360f / 100f;
+        } else {
+            return 360f / totalUnits;
+        }
+    }
+
+    private boolean isPercentage() {
+        return totalUnits == null;
     }
 }
