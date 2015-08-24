@@ -26,6 +26,7 @@ public class CircleMeterView extends RelativeLayout {
     private Float progressAngle;
     private Float prevAngle;
     private TextView actualUnitsTV;
+    private TextView totalUnitsTV;
     private float angleIncrements;
 
     private final static float DEFAULT_STROKE_WIDTH = 15f;
@@ -102,19 +103,21 @@ public class CircleMeterView extends RelativeLayout {
         progressPaint.setStyle(Paint.Style.STROKE);
         progressPaint.setStrokeWidth(strokeWidth);
 
+        // Text views setup
         actualUnitsTV = (TextView) findViewById(R.id.circle_meter_center_text);
         actualUnitsTV.setTextColor(Color.BLACK);
-        TextView totalUnitsTV = (TextView) findViewById(R.id.circle_meter_small_text);
+        totalUnitsTV = (TextView) findViewById(R.id.circle_meter_small_text);
         totalUnitsTV.setTextColor(Color.BLACK);
+        centerText = centerText != null ? centerText : "0";
+        smallText = smallText != null ? smallText : "%";
         actualUnitsTV.setText(centerText);
         totalUnitsTV.setText(smallText);
 
+        // Angles setup
         prevAngle = DEFAULT_START_ANGLE;
         sweepAngle = 0f;
         progressAngle = 0f;
         angleIncrements = getAngleIncrements();
-        centerText = centerText != null ? centerText : "0";
-        smallText = smallText != null ? smallText : "%";
         actualUnits = Float.valueOf(centerText);
         prevActualUnits = 0f;
 
@@ -146,9 +149,13 @@ public class CircleMeterView extends RelativeLayout {
         invalidate();
     }
 
-    public void setCenterText(String centerText) {
-        prevActualUnits = actualUnits;
-        actualUnits = Float.valueOf(centerText);
+    public void setActualUnitsText(String centerText) {
+        this.centerText = centerText;
+        updateMeter();
+    }
+
+    public void setActualUnits(float actualUnits) {
+        prevActualUnits = this.actualUnits;
 
         if (isPercentage()) {
             actualUnits = actualUnits <= 100 ? actualUnits : 100;
@@ -156,13 +163,17 @@ public class CircleMeterView extends RelativeLayout {
             actualUnits = actualUnits <= totalUnits ? actualUnits : totalUnits;
         }
 
-        this.centerText = String.format("%.0f", actualUnits);
-        updateMeter();
+        this.actualUnits = actualUnits;
+        setActualUnitsText(String.format("%.0f", actualUnits));
     }
 
-    public void setActualUnits(float actualUnits) {
-        setCenterText(String.format("%.0f", actualUnits));
-        updateMeter();
+    public void setTotalText(String totalText) {
+        totalUnitsTV.setText(totalText);
+    }
+
+    public void setTotalUnits(Float totalUnits) {
+        this.totalUnits = totalUnits;
+        setTotalText(String.format("%.0f", totalUnits));
     }
 
     public float getActualUnits() {

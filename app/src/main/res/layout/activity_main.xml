@@ -13,9 +13,7 @@
         <com.jonkoester.circlemeterwidget.CircleMeterView
             android:id="@+id/circleMeterWidgetTest"
             android:layout_width="100dp"
-            android:layout_height="100dp"
-            circleMeter:centerText="45"
-            circleMeter:smallText="100" />
+            android:layout_height="100dp" />
 
         <View
             android:layout_width="100dp"
