@@ -175,7 +175,7 @@ public class CircleMeterView extends RelativeLayout {
         updateMeter();
     }
 
-    public void setActualUnits(float actualUnits) {
+    public void setActualUnits(Float actualUnits) {
         prevActualUnits = this.actualUnits;
 
         if (isPercentage()) {

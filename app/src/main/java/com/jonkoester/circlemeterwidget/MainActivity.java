@@ -14,7 +14,8 @@ public class MainActivity extends Activity {
         final CircleMeterView circleMeterView = (CircleMeterView) findViewById(R.id.circleMeterWidgetTest);
         final CircleMeterView circlePercentageView = (CircleMeterView) findViewById(R.id.circleMeterWidgetPercent);
 
-        circleMeterView.setActualUnits(24);
+        circleMeterView.setActualUnits(24f);
+        circleMeterView.setTotalUnits(157f);
 
         Button plusFiveButton = (Button) findViewById(R.id.plusFiveButton);
         plusFiveButton.setOnClickListener(new View.OnClickListener() {
