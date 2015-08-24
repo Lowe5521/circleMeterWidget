@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CircleMeterView">
-        <attr name="centerText" format="string"/>
-        <attr name="smallText" format="string"/>
+        <attr name="actualUnitsText" format="string"/>
+        <attr name="actualUnitsTextColor" format="integer" />
+        <attr name="totalUnitsText" format="string"/>
+        <attr name="totalUnitsTextColor" format="integer" />
+        <attr name="totalBackgroundColor" format="integer" />
+        <attr name="circleFill" format="boolean" />
+        <attr name="circleFillColor" format="integer" />
+        <attr name="progressBarColor" format="integer" />
     </declare-styleable>
 </resources>

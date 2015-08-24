@@ -16,8 +16,6 @@ public class CircleMeterView extends RelativeLayout {
     private RectF frameBounds;
     private Paint circlePaint;
     private Float strokeWidth;
-    private String centerText;
-    private String smallText;
     private Float actualUnits;
     private Float prevActualUnits;
     private Float totalUnits;
@@ -27,10 +25,25 @@ public class CircleMeterView extends RelativeLayout {
     private Float prevAngle;
     private TextView actualUnitsTV;
     private TextView totalUnitsTV;
-    private float angleIncrements;
+    private Float angleIncrements;
 
+    // Styleable properties
+    private String centerText;
+    private String smallText;
+    private Integer actualUnitsTextColor;
+    private Integer totalUnitsTextColor;
+    private Integer totalBackgroundColor;
+    private Boolean circleFill;
+    private Integer circleFillColor;
+    private Integer progressBarColor;
+
+    // Defaults
     private final static float DEFAULT_STROKE_WIDTH = 15f;
     private final static float DEFAULT_START_ANGLE = 90f;
+    private final static int DEFAULT_TOTAL_BACKGROUND_COLOR = Color.TRANSPARENT;
+    private final static int DEFAULT_CIRCLE_FILL_COLOR = Color.BLACK;
+    private final static int DEFAULT_PROGRESS_BAR_COLOR = Color.GRAY;
+    private final static int DEFAULT_TEXT_COLOR = Color.BLACK;
 
     public CircleMeterView(Context context) {
         super(context);
@@ -52,8 +65,14 @@ public class CircleMeterView extends RelativeLayout {
     protected void setAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CircleMeterView);
         try {
-            centerText = a.getString(R.styleable.CircleMeterView_centerText);
-            smallText = a.getString(R.styleable.CircleMeterView_smallText);
+            centerText = a.getString(R.styleable.CircleMeterView_actualUnitsText);
+            smallText = a.getString(R.styleable.CircleMeterView_totalUnitsText);
+            totalBackgroundColor = a.getInteger(R.styleable.CircleMeterView_totalBackgroundColor, DEFAULT_TOTAL_BACKGROUND_COLOR);
+            circleFill = a.getBoolean(R.styleable.CircleMeterView_circleFill, false);
+            circleFillColor = a.getInteger(R.styleable.CircleMeterView_circleFillColor, DEFAULT_CIRCLE_FILL_COLOR);
+            progressBarColor = a.getInteger(R.styleable.CircleMeterView_progressBarColor, DEFAULT_PROGRESS_BAR_COLOR);
+            actualUnitsTextColor = a.getInteger(R.styleable.CircleMeterView_actualUnitsTextColor, DEFAULT_TEXT_COLOR);
+            totalUnitsTextColor = a.getInteger(R.styleable.CircleMeterView_totalUnitsTextColor, DEFAULT_TEXT_COLOR);
         } finally {
             a.recycle();
         }
@@ -83,9 +102,7 @@ public class CircleMeterView extends RelativeLayout {
 
     private void init() {
         inflate(getContext(), R.layout.circle_meter_view, this);
-        if (getBackground() == null) {
-            setBackground(new ColorDrawable(Color.TRANSPARENT));
-        }
+        setBackground(new ColorDrawable(totalBackgroundColor));
 
         circlePaint = new Paint();
         progressPaint = new Paint();
@@ -93,21 +110,25 @@ public class CircleMeterView extends RelativeLayout {
 
         // Circle paint setup
         circlePaint.setAntiAlias(true);
-        circlePaint.setColor(Color.BLACK);
-        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setColor(circleFillColor);
+        if (circleFill) {
+            circlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        } else {
+            circlePaint.setStyle(Paint.Style.STROKE);
+        }
         circlePaint.setStrokeWidth(strokeWidth);
 
         // Progress paint setup
         progressPaint.setAntiAlias(true);
-        progressPaint.setColor(Color.GRAY);
+        progressPaint.setColor(progressBarColor);
         progressPaint.setStyle(Paint.Style.STROKE);
         progressPaint.setStrokeWidth(strokeWidth);
 
         // Text views setup
         actualUnitsTV = (TextView) findViewById(R.id.circle_meter_center_text);
-        actualUnitsTV.setTextColor(Color.BLACK);
+        actualUnitsTV.setTextColor(actualUnitsTextColor);
         totalUnitsTV = (TextView) findViewById(R.id.circle_meter_small_text);
-        totalUnitsTV.setTextColor(Color.BLACK);
+        totalUnitsTV.setTextColor(totalUnitsTextColor);
         centerText = centerText != null ? centerText : "0";
         smallText = smallText != null ? smallText : "%";
         actualUnitsTV.setText(centerText);
@@ -141,9 +162,9 @@ public class CircleMeterView extends RelativeLayout {
 
         if (sweepAngle >= 360f) {
             sweepAngle = 360f;
-            progressPaint.setColor(Color.DKGRAY);
+            progressPaint.setColor(Color.WHITE);
         } else {
-            progressPaint.setColor(Color.GRAY);
+            progressPaint.setColor(progressBarColor);
         }
 
         invalidate();

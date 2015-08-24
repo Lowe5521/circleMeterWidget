@@ -23,8 +23,8 @@
             android:id="@+id/circleMeterWidgetPercent"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            circleMeter:centerText="30"
-            circleMeter:smallText="%" />
+            circleMeter:actualUnitsText="30"
+            circleMeter:totalUnitsText="%" />
     </LinearLayout>
 
     <LinearLayout
@@ -43,6 +43,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="-5"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <com.jonkoester.circlemeterwidget.CircleMeterView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            circleMeter:actualUnitsText="67"
+            circleMeter:circleFill="true"
+            circleMeter:actualUnitsTextColor="@color/white"
+            circleMeter:totalUnitsTextColor="@color/white"
+            circleMeter:progressBarColor="@color/blue"/>
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dp" />
+
+        <com.jonkoester.circlemeterwidget.CircleMeterView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            circleMeter:actualUnitsText="77"
+            circleMeter:totalUnitsText="450"
+            circleMeter:actualUnitsTextColor="@color/orange"
+            circleMeter:totalUnitsTextColor="@color/red"
+            circleMeter:circleFill="true"
+            circleMeter:circleFillColor="@color/green"
+            circleMeter:totalBackgroundColor="@color/black"
+            circleMeter:progressBarColor="@color/blue"/>
 
     </LinearLayout>
 
